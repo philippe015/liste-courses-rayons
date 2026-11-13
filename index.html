@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="fr">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#245a42">
+<title>Mon panier · Liste de courses</title>
+<link rel="stylesheet" href="style.css">
+<body>
+<main>
+<header><span class="badge">MON PANIER</span><h1>Les courses,<br>dans le bon ordre.</h1><p>Votre liste organisée par rayon, pour aller à l’essentiel.</p></header>
+<section class="card" aria-label="Préparer mes courses">
+<label for="store">Mon magasin</label><select id="store"><option value="lidl">Lidl</option><option value="leclerc">E.Leclerc</option></select>
+<form id="add-form"><label for="product">Ajouter un article</label><div class="fields"><input id="product" maxlength="160" placeholder="Ex. : tomates, lait, pâtes…" required list="suggestions"><datalist id="suggestions"></datalist><input id="quantity" type="number" min="1" max="999" value="1" aria-label="Quantité" required><button type="submit">Ajouter</button></div><label for="aisle">Rayon</label><select id="aisle"><option value="auto">Détection automatique</option></select></form>
+<p id="status" role="status" aria-live="polite"></p>
+</section>
+<section class="list-head"><h2>Ma liste <span id="count"></span></h2><button id="clear" class="secondary">Retirer les articles cochés</button></section>
+<progress id="progress" value="0" max="1" aria-label="Progression des courses"></progress>
+<div id="list"></div>
+<details class="card"><summary>Personnaliser le parcours des rayons</summary><p>L’ordre proposé est un exemple : adaptez-le à votre magasin. Chaque enseigne conserve son propre parcours.</p><div id="order"></div></details>
+<footer><button id="export" class="secondary">Copier la liste</button><button id="print" class="secondary">Imprimer</button><p>Votre liste reste enregistrée dans ce navigateur. Application indépendante de Lidl et E.Leclerc.</p></footer>
+</main><script src="catalog.js"></script><script src="app.js"></script>
+</body></html>
