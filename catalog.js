@@ -15,9 +15,17 @@ const AISLES = {
   other: ['🛒', 'Autres articles', []]
 };
 const DEFAULT_ORDERS = {
-  lidl: ['produce', 'bakery', 'meat', 'fish', 'dairy', 'pantry', 'sweet', 'drinks', 'home', 'care', 'pets', 'frozen', 'other'],
+  lidl: ['bakery', 'produce', 'meat', 'fish', 'dairy', 'frozen', 'drinks', 'pantry', 'home', 'care', 'pets', 'sweet', 'other'],
   leclerc: ['produce', 'fish', 'meat', 'bakery', 'dairy', 'pantry', 'sweet', 'drinks', 'care', 'home', 'pets', 'frozen', 'other']
 };
+// Parcours proposé : entrée, côté droit, fond, puis retour par les allées centrales.
+// Le plan de 2022 ne situe pas clairement fruits/légumes et poisson : positions provisoires.
+const LEGACY_LIDL_ORDER = ['produce', 'bakery', 'meat', 'fish', 'dairy', 'pantry', 'sweet', 'drinks', 'home', 'care', 'pets', 'frozen', 'other'];
+function restoreOrder(store, order) {
+  if (!Array.isArray(order) || order.length !== Object.keys(AISLES).length || new Set(order).size !== order.length || !order.every(id => Object.hasOwn(AISLES, id))) return [...DEFAULT_ORDERS[store]];
+  if (store === 'lidl' && order.join(',') === LEGACY_LIDL_ORDER.join(',')) return [...DEFAULT_ORDERS.lidl];
+  return [...order];
+}
 function normalize(value) { return value.toLowerCase().replace(/œ/g, 'oe').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[-’']/g, ' '); }
 function detectAisle(name) {
   const words = normalize(name).split(/\s+/);
@@ -31,4 +39,4 @@ function detectAisle(name) {
   }
   return result;
 }
-if (typeof module !== 'undefined') module.exports = { AISLES, DEFAULT_ORDERS, detectAisle };
+if (typeof module !== 'undefined') module.exports = { AISLES, DEFAULT_ORDERS, detectAisle, restoreOrder };
