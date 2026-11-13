@@ -8,8 +8,7 @@ try {
     state.store = saved.store;
     state.items = saved.items.filter(i => i && typeof i.id === 'string' && typeof i.name === 'string' && AISLES[i.aisle] && Number.isInteger(i.quantity) && i.quantity > 0 && i.quantity <= 999).map(i => ({ ...i, done: i.done === true }));
     for (const store of Object.keys(DEFAULT_ORDERS)) {
-      const order = saved.orders?.[store];
-      if (Array.isArray(order) && order.length === Object.keys(AISLES).length && new Set(order).size === order.length && order.every(id => AISLES[id])) state.orders[store] = order;
+      state.orders[store] = restoreOrder(store, saved.orders?.[store]);
     }
   }
 } catch { $('status').textContent = 'La sauvegarde est indisponible ou illisible. Vous pouvez utiliser la liste pendant cette session.'; }
@@ -28,6 +27,8 @@ function button(text, label, action) {
 }
 function render() {
   $('store').value = state.store;
+  $('route-note').hidden = state.store !== 'lidl';
+  $('reset-route').textContent = state.store === 'lidl' ? 'Appliquer le parcours Champigny' : 'Rétablir le parcours Leclerc';
   const done = state.items.filter(i => i.done).length;
   $('count').textContent = `${done}/${state.items.length}`;
   $('progress').max = state.items.length || 1; $('progress').value = done;
@@ -68,6 +69,11 @@ for (const [id, [, title, terms]] of Object.entries(AISLES)) {
   for (const term of terms) { const suggestion = element('option'); suggestion.value = term; $('suggestions').append(suggestion); }
 }
 $('store').addEventListener('change', () => { state.store = $('store').value; save(); render(); });
+$('reset-route').addEventListener('click', () => {
+  state.orders[state.store] = [...DEFAULT_ORDERS[state.store]];
+  save(); render();
+  $('status').textContent = 'Parcours appliqué. Vos articles sont conservés et triés dans cet ordre.';
+});
 $('add-form').addEventListener('submit', event => {
   event.preventDefault(); const name = $('product').value.trim(); if (!name) { $('product').focus(); return; }
   const quantity = Number($('quantity').value); if (!Number.isInteger(quantity) || quantity < 1 || quantity > 999) return;
@@ -78,7 +84,7 @@ $('add-form').addEventListener('submit', event => {
 $('clear').addEventListener('click', () => { state.items = state.items.filter(i => !i.done); save(); render(); });
 $('print').addEventListener('click', () => window.print());
 $('export').addEventListener('click', async () => {
-  const lines = ['Ma liste de courses — ' + (state.store === 'lidl' ? 'Lidl' : 'E.Leclerc')];
+  const lines = ['Ma liste de courses — ' + (state.store === 'lidl' ? 'Lidl Champigny — rue de Bernau' : 'E.Leclerc')];
   for (const id of state.orders[state.store]) {
     const items = state.items.filter(i => i.aisle === id); if (!items.length) continue;
     lines.push('\n' + AISLES[id][1], ...items.map(i => `${i.done ? '☑' : '☐'} ${i.name} × ${i.quantity}`));
