@@ -16,6 +16,16 @@ Les parcours par défaut sont des exemples personnalisables, et non les plans of
 
 Application indépendante, sans affiliation à Lidl ou E.Leclerc.
 
+## Parcours Lidl Champigny
+
+Le profil Lidl correspond au magasin du 1388 rue de Bernau à Champigny-sur-Marne. Il propose un trajet depuis l’entrée, par le côté droit et le fond, puis un retour par les allées centrales vers les caisses. La liste affichée, copiée et imprimée suit le même ordre.
+
+Ordre proposé : pain → fruits et légumes → viande et charcuterie → poisson → produits frais et œufs → surgelés → boissons → épicerie salée → entretien → hygiène et bébé → animaux → épicerie sucrée → autres.
+
+Source : [dossier pédagogique du concours général des métiers 2022, page 40](https://j4.cerpeg.fr/images/ConcoursDesMetiers/mcv-a/2022/CGM_BacPro-MCVA_2022_EpreuveOrale-SUJET.pdf#page=40). Il s’agit d’une interprétation du plan ancien, sans garantie de correspondance avec l’aménagement actuel. Le document précise que certaines données ont été modifiées pour confidentialité. Les positions des fruits et légumes et du poisson restent provisoires ; les grandes catégories de l’application regroupent parfois plusieurs emplacements du plan, notamment la viande et la charcuterie.
+
+L’ancien parcours Lidl par défaut est automatiquement remplacé, sans supprimer les articles. Les parcours personnalisés sont conservés. Pour appliquer volontairement le nouveau parcours à une liste déjà personnalisée, ouvrir « Personnaliser le parcours des rayons », puis « Appliquer le parcours Champigny ».
+
 ## Vérification
 
 Avec Node.js : `node --test catalog.test.cjs`. Aucune installation nécessaire.
