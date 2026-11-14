@@ -1,0 +1,75 @@
+name: Publier la version telechargeable
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/release.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: release-v1.0.0
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verifier l'application
+        run: |
+          node --check app.js
+          node --check catalog.js
+          node --test catalog.test.cjs
+      - name: Preparer le telechargement
+        run: |
+          mkdir -p package/mon-panier
+          cp index.html style.css app.js catalog.js README.md package/mon-panier/
+          cat > package/mon-panier/LISEZ-MOI.txt <<'NOTES'
+          MON PANIER - VERSION 1.0.0
+
+          1. Decompressez completement le fichier ZIP.
+          2. Ouvrez le dossier mon-panier.
+          3. Ouvrez index.html dans un navigateur recent.
+
+          Conservez index.html, style.css, app.js et catalog.js ensemble.
+          Choisissez Lidl Champigny ou E.Leclerc et ajoutez vos produits.
+          Le parcours de Champigny est propose d'apres un plan de 2022 :
+          adaptez l'ordre des rayons si necessaire.
+
+          Application web, sans installateur APK Android ou executable Windows.
+          La liste est sauvegardee dans le navigateur quand celui-ci le permet.
+          Le stockage des pages ouvertes depuis un fichier depend du navigateur.
+          La copie de la liste peut necessiter une page servie en HTTPS.
+          NOTES
+          cd package
+          zip -r ../mon-panier-v1.0.0.zip mon-panier
+          cd ..
+          sha256sum mon-panier-v1.0.0.zip > SHA256SUMS.txt
+          cat > release-notes.md <<'NOTES'
+          ## Mon panier v1.0.0
+
+          Telechargez **mon-panier-v1.0.0.zip** ci-dessous, decompressez-le puis ouvrez **mon-panier/index.html** dans un navigateur recent.
+
+          - Liste de courses en francais avec quantites et cases a cocher.
+          - Classement par rayon pour Lidl Champigny et E.Leclerc.
+          - Parcours personnalisable et sauvegarde locale.
+          - Copie et impression de la liste.
+
+          Le parcours de Champigny repose sur un plan de 2022 et reste a confirmer sur place.
+          Il s'agit d'une application web, sans installateur APK ou EXE.
+          La sauvegarde locale depend du navigateur lorsque la page est ouverte depuis un fichier ; la copie peut necessiter HTTPS.
+          NOTES
+      - name: Publier la release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_COMMIT: ${{ github.sha }}
+        run: |
+          if gh release view v1.0.0 >/dev/null 2>&1; then
+            echo "La version v1.0.0 existe deja ; aucun fichier ne sera remplace."
+            exit 0
+          fi
+          gh release create v1.0.0 mon-panier-v1.0.0.zip SHA256SUMS.txt --target "$RELEASE_COMMIT" --title "Mon panier v1.0.0" --notes-file release-notes.md
